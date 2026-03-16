@@ -3,8 +3,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { prisma } from "@/lib/prisma";
 import { getOrCreateStudent } from "@/lib/student";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const MODEL = "claude-sonnet-4-20250514";
+const AI_ENABLED = !!process.env.ANTHROPIC_API_KEY;
 
 type AITask =
   | "grade_translation"
@@ -134,11 +134,25 @@ TUTOR BEHAVIOR:
 - Use bullet points for grammar explanations, not long paragraphs.`;
 }
 
+const NO_AI_RESPONSES: Record<string, string> = {
+  grade_translation: "---\nSCORE: —/10\nOVERALL: AI grading is not configured yet. Review your translation against the vocabulary list in the Reference tab.\n\nLINE BY LINE:\nCheck each phrase against your Unit vocab and grammar rules.\n\nKEY ERRORS:\nReview your work manually using the Grammar Reference.\n\nREWRITE PROMPT:\nTry rewriting your translation once more before checking the answer.\n---",
+  grade_writing: "---\nSCORE: —/10\n\nSTRENGTHS:\n- AI feedback is not configured yet.\n\nERRORS (line by line):\nReview your writing against the target grammar structures listed above.\n\nCATEGORIES ANALYSIS:\n- Check your vocab, conjugations, agreement, and connectors manually.\n\nREWRITE PROMPT:\nRewrite your passage and try to improve one grammar point.\n---",
+  journal_feedback: "---\nGREAT JOB: Writing in French is great practice — keep it up!\n\nFOCUS ON THESE 2–3 THINGS:\n1. Check every verb conjugation matches its subject.\n2. Make sure adjectives agree in gender and number with their nouns.\n3. Use connector words (mais, et, donc, parce que) to link ideas.\n\nBONUS CHALLENGE: Try adding one sentence using a new vocab word from your current unit.\n---",
+  grade_reading: "AI grading is not configured. Review each answer against the passage — re-read any paragraph where you were unsure.",
+  explain_grammar: "AI explanations are not configured. Check the Grammar tab in your current unit for rules and examples, or visit the Reference page.",
+  tutor_chat: "The AI Tutor is not configured yet. You can still practice using the Flashcards, Exercises, and Quizzes tabs. Check the Grammar Reference for any questions about rules.",
+};
+
 export async function POST(req: Request) {
   try {
     const body: AIRequest = await req.json();
     const { task, content, context } = body;
 
+    if (!AI_ENABLED) {
+      return NextResponse.json({ response: NO_AI_RESPONSES[task] ?? "AI features are not configured.", aiDisabled: true });
+    }
+
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const student = await getOrCreateStudent();
 
     // Build mistakes context for tutor
@@ -207,7 +221,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Unknown task" }, { status: 400 });
     }
 
-    const response = await anthropic.messages.create({
+    const response = await new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }).messages.create({
       model: MODEL,
       max_tokens: 1024,
       system: systemPrompt,
