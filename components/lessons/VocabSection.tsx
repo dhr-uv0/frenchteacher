@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { VocabItem } from "@/data/curriculum";
+import { addCustomVocab } from "@/lib/store";
 import { Volume2, Plus, ChevronDown, ChevronUp } from "lucide-react";
 
 interface Props {
@@ -55,21 +56,16 @@ export default function VocabSection({ vocab, unit, onMastered }: Props) {
     return matchFilter && matchSearch;
   });
 
-  async function saveCustomWord() {
+  function saveCustomWord() {
     if (!customFr.trim() || !customEn.trim()) return;
     setSaving(true);
     try {
-      const res = await fetch("/api/custom-vocab", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          french: customFr,
-          english: customEn,
-          unitNumber: unit,
-          notes: customNote,
-        }),
+      const saved = addCustomVocab({
+        french: customFr,
+        english: customEn,
+        unitNumber: unit,
+        notes: customNote,
       });
-      const saved = await res.json();
       setSavedCustom((prev) => [
         ...prev,
         {

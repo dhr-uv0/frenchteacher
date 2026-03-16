@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { getStudent, getMistakes } from "@/lib/store";
 import { Send, Bot, User, RefreshCw, BookOpen } from "lucide-react";
 
 interface Message {
@@ -34,6 +35,7 @@ function TutorContent() {
   const [input, setInput] = useState(initialTopic ? `Explain: ${initialTopic}` : "");
   const [loading, setLoading] = useState(false);
   const [currentUnit, setCurrentUnit] = useState(3);
+  const [weakAreas, setWeakAreas] = useState<string[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -41,12 +43,13 @@ function TutorContent() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Fetch student's current unit
+  // Load student data and weak areas from store
   useEffect(() => {
-    fetch("/api/student")
-      .then((r) => r.json())
-      .then((d) => setCurrentUnit(d.student?.currentUnit ?? 3))
-      .catch(() => {});
+    const student = getStudent();
+    setCurrentUnit(student.currentUnit);
+    const recentMistakes = getMistakes(10).filter((m) => !m.reviewed);
+    const cats = recentMistakes.map((m) => m.category);
+    setWeakAreas(cats.filter((v, i) => cats.indexOf(v) === i));
   }, []);
 
   async function send(text?: string) {
@@ -65,6 +68,7 @@ function TutorContent() {
         body: JSON.stringify({
           task: "tutor_chat",
           content: userMsg,
+          weakAreas,
           context: {
             unit: currentUnit,
             history: newMessages.slice(-10).map((m) => ({ role: m.role, content: m.content })),

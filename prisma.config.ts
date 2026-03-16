@@ -1,12 +1,3 @@
-import "dotenv/config";
-import { defineConfig } from "prisma/config";
-
-export default defineConfig({
-  schema: "prisma/schema.prisma",
-  migrations: {
-    path: "prisma/migrations",
-  },
-  datasource: {
-    url: "file:prisma/dev.db",
-  },
-});
+// Prisma removed — this file is no longer used.
+// Data is stored in localStorage via lib/store.ts
+export {};

@@ -5,6 +5,13 @@ import Link from "next/link";
 import { cn, getUnitColor, formatTime, formatDate } from "@/lib/utils";
 import { UNITS } from "@/data/curriculum";
 import {
+  getStudent,
+  getUnitProgress,
+  getMistakes,
+  getSessions,
+} from "@/lib/store";
+import type { UnitProgress, MistakeEntry, StudySession } from "@/lib/store";
+import {
   Flame,
   BookOpen,
   Layers,
@@ -18,35 +25,8 @@ import {
   Plus,
 } from "lucide-react";
 
-interface UnitProgress {
-  unitNumber: number;
-  masteryPct: number;
-  isUnlocked: boolean;
-  isComplete: boolean;
-}
-
-interface Mistake {
-  id: string;
-  category: string;
-  question: string;
-  wrongAnswer: string;
-  rightAnswer: string;
-  unitNumber: number | null;
-  createdAt: string;
-  reviewed: boolean;
-}
-
-interface Session {
-  id: string;
-  sessionType: string;
-  unitNumber: number | null;
-  score: number | null;
-  totalItems: number;
-  correctItems: number;
-  timeSpentSec: number;
-  createdAt: string;
-  reviewNext: string | null;
-}
+type Mistake = MistakeEntry;
+type Session = StudySession;
 
 interface CanvasAssignment {
   id: number;
@@ -86,7 +66,7 @@ const UNIT_COLORS_LIGHT: Record<string, string> = {
 export default function DashboardClient() {
   const [student, setStudent] = useState<{
     name: string;
-    streak: number;
+    streakDays: number;
     currentUnit: number;
   } | null>(null);
   const [unitProgress, setUnitProgress] = useState<UnitProgress[]>([]);
@@ -96,33 +76,27 @@ export default function DashboardClient() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function load() {
-      try {
-        const [studentRes, mistakesRes, sessionsRes, canvasRes] = await Promise.all([
-          fetch("/api/student"),
-          fetch("/api/mistakes?limit=20"),
-          fetch("/api/sessions?limit=10"),
-          fetch("/api/canvas?endpoint=assignments"),
-        ]);
-        const { student: s, unitProgress: up } = await studentRes.json();
-        const { mistakes: m } = await mistakesRes.json();
-        const { sessions: sess } = await sessionsRes.json();
-        const canvasData = await canvasRes.json();
+    // Load from localStorage (synchronous)
+    const s = getStudent();
+    const up = getUnitProgress();
+    const m = getMistakes(20);
+    const sess = getSessions(10);
 
-        setStudent(s);
-        setUnitProgress(up ?? []);
-        setMistakes(m ?? []);
-        setSessions(sess ?? []);
+    setStudent({ name: s.name, streakDays: s.streakDays, currentUnit: s.currentUnit });
+    setUnitProgress(up);
+    setMistakes(m);
+    setSessions(sess);
+    setLoading(false);
+
+    // Canvas still uses fetch
+    fetch("/api/canvas?endpoint=assignments")
+      .then((r) => r.json())
+      .then((canvasData) => {
         if (canvasData.configured && canvasData.data) {
           setCanvasAssignments(canvasData.data.slice(0, 5));
         }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
+      })
+      .catch(() => {});
   }, []);
 
   if (loading) return null;
@@ -153,7 +127,7 @@ export default function DashboardClient() {
             style={{ backgroundColor: "var(--surface2)", color: "var(--text)" }}
           >
             <Flame className="h-4 w-4 text-orange-500" />
-            {student?.streak ?? 0} day streak
+            {student?.streakDays ?? 0} day streak
           </div>
         </div>
       </div>

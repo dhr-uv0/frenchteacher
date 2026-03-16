@@ -4,6 +4,7 @@ import { useState } from "react";
 import { WRITING_PROMPTS } from "@/data/curriculum";
 import { UNITS } from "@/data/curriculum";
 import { cn } from "@/lib/utils";
+import { addSession } from "@/lib/store";
 
 export default function WritingPage() {
   const [selectedUnit, setSelectedUnit] = useState(3);
@@ -45,17 +46,18 @@ export default function WritingPage() {
         setFeedback(data.response);
         setRewriteMode(true);
 
-        // Save session
-        await fetch("/api/sessions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        // Save session via store
+        try {
+          addSession({
             sessionType: "writing",
             unitNumber: selectedUnit,
+            score: null,
             totalItems: 1,
+            correctItems: 0,
             timeSpentSec: 0,
-          }),
-        }).catch(() => {});
+            reviewNext: null,
+          });
+        } catch {}
       }
     } catch {
       const msg = "Could not get AI feedback — check ANTHROPIC_API_KEY.";

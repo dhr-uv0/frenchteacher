@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { getOrCreateStudent } from "@/lib/student";
 import {
   gradeTranslation,
   gradeWriting,
@@ -21,6 +19,7 @@ type AITask =
 interface AIRequest {
   task: AITask;
   content: string;
+  weakAreas?: string[];
   context?: {
     unit?: number;
     targetStructures?: string[];
@@ -31,22 +30,9 @@ interface AIRequest {
 export async function POST(req: Request) {
   try {
     const body: AIRequest = await req.json();
-    const { task, content, context } = body;
+    const { task, content, context, weakAreas } = body;
 
-    const student = await getOrCreateStudent();
-
-    let weakAreas: string[] = [];
-    if (task === "tutor_chat") {
-      const recentMistakes = await prisma.mistakeEntry.findMany({
-        where: { studentId: student.id, reviewed: false },
-        orderBy: { createdAt: "desc" },
-        take: 10,
-      });
-      const cats: string[] = recentMistakes.map((m: { category: string }) => m.category);
-      weakAreas = cats.filter((v, i) => cats.indexOf(v) === i);
-    }
-
-    const unit = context?.unit ?? student.currentUnit ?? 3;
+    const unit = context?.unit ?? 3;
     let response = "";
 
     switch (task) {
@@ -66,7 +52,7 @@ export async function POST(req: Request) {
         response = explainGrammar(content);
         break;
       case "tutor_chat":
-        response = tutorChat(content, unit, weakAreas);
+        response = tutorChat(content, unit, weakAreas ?? []);
         break;
       default:
         return NextResponse.json({ error: "Unknown task" }, { status: 400 });

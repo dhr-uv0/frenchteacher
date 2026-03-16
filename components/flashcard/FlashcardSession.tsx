@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { ALL_VOCAB, GLUE_WORDS, getVocabByUnit } from "@/data/curriculum";
 import type { VocabItem } from "@/data/curriculum";
+import { getCustomVocab, getDueFlashcards, upsertFlashcard, addMistake, addSession } from "@/lib/store";
+import { calculateNextReview, qualityFromButton } from "@/lib/srs";
+import type { SRSCard } from "@/lib/srs";
 import { Volume2, RotateCcw, ChevronRight } from "lucide-react";
 
 type Direction = "fr_en" | "en_fr";
@@ -29,32 +32,25 @@ export default function FlashcardSession() {
   const [loading, setLoading] = useState(false);
   const [customVocab, setCustomVocab] = useState<VocabItem[]>([]);
 
-  // Load custom vocab
+  // Load custom vocab from localStorage
   useEffect(() => {
-    fetch("/api/custom-vocab")
-      .then((r) => r.json())
-      .then((data) => {
-        const mapped: VocabItem[] = (data.vocab ?? []).map((v: {
-          id: string; french: string; english: string; unitNumber: number | null;
-        }) => ({
-          key: `custom_${v.id}`,
-          french: v.french,
-          english: v.english,
-          partOfSpeech: "custom",
-          unit: v.unitNumber ?? 0,
-        }));
-        setCustomVocab(mapped);
-      })
-      .catch(() => {});
+    const data = getCustomVocab();
+    const mapped: VocabItem[] = data.map((v) => ({
+      key: `custom_${v.id}`,
+      french: v.french,
+      english: v.english,
+      partOfSpeech: "custom",
+      unit: v.unitNumber ?? 0,
+    }));
+    setCustomVocab(mapped);
   }, []);
 
   const buildDeck = useCallback(
-    async (f: FilterUnit, d: Direction): Promise<VocabItem[]> => {
+    (f: FilterUnit, d: Direction): VocabItem[] => {
       if (f === "due") {
-        // Get SRS-due cards from API
-        const res = await fetch(`/api/flashcards?direction=${d}&limit=30`);
-        const data = await res.json();
-        const dueKeys = new Set<string>((data.cards ?? []).map((c: { vocabKey: string }) => c.vocabKey));
+        // Get SRS-due cards from store
+        const dueCards = getDueFlashcards(d, 30);
+        const dueKeys = new Set<string>(dueCards.map((c) => c.vocabKey));
         if (dueKeys.size === 0) {
           // Fall back to all unlocked vocab
           return [...ALL_VOCAB.filter((v) => v.unit <= 3), ...customVocab];
@@ -69,9 +65,9 @@ export default function FlashcardSession() {
     [customVocab]
   );
 
-  const startSession = async () => {
+  const startSession = () => {
     setLoading(true);
-    const cards = await buildDeck(filter, direction);
+    const cards = buildDeck(filter, direction);
     // Shuffle
     const shuffled = [...cards].sort(() => Math.random() - 0.5);
     setDeck(shuffled);
@@ -99,7 +95,7 @@ export default function FlashcardSession() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  async function handleResponse(response: "got_it" | "again") {
+  function handleResponse(response: "got_it" | "again") {
     const card = deck[index];
     const correct = response === "got_it";
 
@@ -108,33 +104,39 @@ export default function FlashcardSession() {
       again: prev.again + (correct ? 0 : 1),
     }));
 
-    // Update SRS
+    // Update SRS via store
     try {
-      await fetch("/api/flashcards", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          vocabKey: card.key,
-          direction,
-          button: response,
-        }),
+      const allCards = getDueFlashcards(direction, 1000);
+      const existing = allCards.find(
+        (c) => c.vocabKey === card.key && c.direction === direction
+      );
+      const srsCard: SRSCard = {
+        easeFactor: existing?.easeFactor ?? 2.5,
+        interval: existing?.interval ?? 0,
+        repetitions: existing?.repetitions ?? 0,
+        nextReview: existing ? new Date(existing.nextReview) : new Date(),
+      };
+      const quality = qualityFromButton(response);
+      const updated = calculateNextReview(srsCard, quality);
+      upsertFlashcard({
+        vocabKey: card.key,
+        direction,
+        easeFactor: updated.easeFactor,
+        interval: updated.interval,
+        repetitions: updated.repetitions,
+        nextReview: updated.nextReview,
       });
     } catch {}
 
     // If wrong, record mistake
     if (!correct) {
       try {
-        await fetch("/api/mistakes", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            vocabKey: card.key,
-            unitNumber: card.unit || null,
-            category: "vocabulary",
-            question: direction === "fr_en" ? card.french : card.english,
-            wrongAnswer: "(skipped)",
-            rightAnswer: direction === "fr_en" ? card.english : card.french,
-          }),
+        addMistake({
+          unitNumber: card.unit || null,
+          category: "vocabulary",
+          question: direction === "fr_en" ? card.french : card.english,
+          wrongAnswer: "(skipped)",
+          rightAnswer: direction === "fr_en" ? card.english : card.french,
         });
       } catch {}
     }
@@ -142,26 +144,26 @@ export default function FlashcardSession() {
     if (index + 1 >= deck.length) {
       // End session
       const timeSec = Math.round((Date.now() - startTime) / 1000);
+      const newCorrect = sessionStats.correct + (correct ? 1 : 0);
+      const newAgain = sessionStats.again + (correct ? 0 : 1);
       const final = {
         total: deck.length,
-        correct: sessionStats.correct + (correct ? 1 : 0),
-        again: sessionStats.again + (correct ? 0 : 1),
+        correct: newCorrect,
+        again: newAgain,
         timeSec,
       };
       setSummary(final);
 
-      // Save session
+      // Save session via store
       try {
-        await fetch("/api/sessions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            sessionType: "flashcard",
-            totalItems: final.total,
-            correctItems: final.correct,
-            score: (final.correct / final.total) * 100,
-            timeSpentSec: timeSec,
-          }),
+        addSession({
+          sessionType: "flashcard",
+          unitNumber: null,
+          score: (final.correct / final.total) * 100,
+          totalItems: final.total,
+          correctItems: final.correct,
+          timeSpentSec: timeSec,
+          reviewNext: null,
         });
       } catch {}
     } else {

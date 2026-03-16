@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { cn, formatTime } from "@/lib/utils";
 import { ALL_VOCAB, GRAMMAR_RULES } from "@/data/curriculum";
+import { addMistake, addSession } from "@/lib/store";
 import { CheckCircle2, XCircle, Timer, RefreshCw, ChevronRight } from "lucide-react";
 
 type QuizMode = "practice" | "test" | "mistakes";
@@ -146,18 +147,16 @@ function QuizContent() {
     setChecked((prev) => ({ ...prev, [current]: true }));
     const isCorrect = normalizeAnswer(answer) === normalizeAnswer(q.correctAnswer);
     if (!isCorrect) {
-      fetch("/api/mistakes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      try {
+        addMistake({
           unitNumber: q.unit,
           category: q.category,
           question: q.question,
           wrongAnswer: answer || "(blank)",
           rightAnswer: q.correctAnswer,
           explanation: q.explanation,
-        }),
-      }).catch(() => {});
+        });
+      } catch {}
     }
   }
 
@@ -204,11 +203,9 @@ function QuizContent() {
     setResult(sessionResult);
     setQuizActive(false);
 
-    // Save session
-    fetch("/api/sessions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    // Save session via store
+    try {
+      addSession({
         sessionType: mode === "test" ? "test" : "quiz",
         unitNumber: selectedUnit,
         score,
@@ -217,8 +214,8 @@ function QuizContent() {
         timeSpentSec: elapsed,
         summary: `Unit ${selectedUnit} ${mode}: ${correct}/${questions.length} correct`,
         reviewNext,
-      }),
-    }).catch(() => {});
+      });
+    } catch {}
   }
 
   const q = questions[current];

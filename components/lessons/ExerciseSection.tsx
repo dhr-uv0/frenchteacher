@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import type { VocabItem, GrammarRule } from "@/data/curriculum";
+import { addMistake } from "@/lib/store";
 import { CheckCircle2, XCircle, RefreshCw } from "lucide-react";
 
 type ExerciseType =
@@ -141,22 +142,20 @@ function FillBlankExercise({
     setChecked(true);
     if (correct >= Math.ceil(questions.length * 0.7)) onComplete();
 
-    // Log mistakes
+    // Log mistakes via store
     questions.forEach((q, i) => {
       const ans = answers[i]?.trim() ?? "";
       if (ans.toLowerCase() !== q.answer.toLowerCase()) {
-        fetch("/api/mistakes", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        try {
+          addMistake({
             unitNumber: unit,
             category: "grammar",
             question: q.sentence.replace("___", "___"),
             wrongAnswer: ans || "(blank)",
             rightAnswer: q.answer,
             explanation: q.hint,
-          }),
-        }).catch(() => {});
+          });
+        } catch {}
       }
     });
   }

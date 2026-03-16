@@ -2,15 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { cn, formatDate } from "@/lib/utils";
+import { getJournalEntries, addJournalEntry, updateJournalFeedback } from "@/lib/store";
+import type { JournalEntry } from "@/lib/store";
 import { BookMarked, Sparkles, ChevronDown, ChevronUp, Plus } from "lucide-react";
-
-interface JournalEntry {
-  id: string;
-  content: string;
-  aiFeedback: string | null;
-  wordCount: number;
-  createdAt: string;
-}
 
 export default function JournalPage() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
@@ -21,22 +15,14 @@ export default function JournalPage() {
   const [mode, setMode] = useState<"write" | "history">("write");
 
   useEffect(() => {
-    fetch("/api/journal")
-      .then((r) => r.json())
-      .then((d) => setEntries(d.entries ?? []))
-      .catch(() => {});
+    setEntries(getJournalEntries());
   }, []);
 
-  async function saveEntry() {
+  function saveEntry() {
     if (!newEntry.trim()) return;
     setSaving(true);
     try {
-      const res = await fetch("/api/journal", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: newEntry }),
-      });
-      const saved = await res.json();
+      const saved = addJournalEntry(newEntry);
       setEntries((prev) => [saved, ...prev]);
       setNewEntry("");
       setMode("history");
@@ -56,12 +42,8 @@ export default function JournalPage() {
         }),
       });
       const data = await res.json();
-      // Save feedback
-      await fetch("/api/journal", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: entry.id, aiFeedback: data.response }),
-      });
+      // Save feedback to store
+      updateJournalFeedback(entry.id, data.response);
       setEntries((prev) =>
         prev.map((e) => (e.id === entry.id ? { ...e, aiFeedback: data.response } : e))
       );
