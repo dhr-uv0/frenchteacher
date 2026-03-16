@@ -21,14 +21,14 @@ interface Props {
 }
 
 export default function ExerciseSection({ vocab, grammar, unit, onMastered }: Props) {
-  const [activeType, setActiveType] = useState<ExerciseType>("fill_blank");
+  const [activeType, setActiveType] = useState<ExerciseType>("word_bank");
 
   const exerciseTypes: { id: ExerciseType; label: string; desc: string }[] = [
-    { id: "fill_blank", label: "Fill in the Blank", desc: "French → English: complete the sentence" },
-    { id: "translation", label: "English → French", desc: "Translate with AI grading + corrections" },
-    { id: "word_bank", label: "Sentence Builder", desc: "Arrange words to form correct French sentences" },
+    { id: "word_bank", label: "⭐ Sentence Builder", desc: "Given a verb + adjectives — arrange words into a correct French sentence" },
+    { id: "fill_blank", label: "Fill in the Blank", desc: "Complete the sentence with the correct French word" },
+    { id: "translation", label: "English → French", desc: "Translate a full sentence and get instant feedback" },
     { id: "reading_check", label: "Reading Check", desc: "Short passage with comprehension questions" },
-    { id: "timed_write", label: "Timed Write", desc: "3-minute production sprint — no looking back!" },
+    { id: "timed_write", label: "Timed Write", desc: "3-minute free production sprint" },
   ];
 
   return (
@@ -443,36 +443,170 @@ function TranslationExercise({
 
 // ── Word Bank Exercise ─────────────────────────────────────────────────────────
 
-const WORD_BANK_SENTENCES: Record<number, { words: string[]; answer: string; hint: string }[]> = {
+// Sentence Builder — each prompt gives a VERB and ADJECTIVE(S) to use.
+// Slightly more complex than single-word: includes adjective agreement, adverbs, conjunctions.
+const WORD_BANK_SENTENCES: Record<number, { words: string[]; answer: string; hint: string; verbFocus?: string }[]> = {
   1: [
-    { words: ["suis", "je", "américain", "pas", "ne"], answer: "je ne suis pas américain", hint: "Negation wraps around être: ne...pas" },
-    { words: ["s'appelle", "elle", "Marie"], answer: "elle s'appelle Marie", hint: "She is called / her name is..." },
-    { words: ["sommes", "nous", "canadiens"], answer: "nous sommes canadiens", hint: "We are Canadian (plural masculine)" },
+    {
+      words: ["suis", "je", "grand", "et", "sportif"],
+      answer: "je suis grand et sportif",
+      hint: "Verb: être — two adjectives joined by et (both masculine here)",
+      verbFocus: "être + adjectives",
+    },
+    {
+      words: ["est", "elle", "petite", "très", "intelligente", "mais"],
+      answer: "elle est petite mais très intelligente",
+      hint: "Verb: être — mais (but) connects two adjectives; très intensifies the second",
+      verbFocus: "être + contrast with mais",
+    },
+    {
+      words: ["ne", "nous", "sommes", "timides", "pas"],
+      answer: "nous ne sommes pas timides",
+      hint: "Verb: être — negation ne…pas wraps around the verb",
+      verbFocus: "ne…pas + être",
+    },
+    {
+      words: ["il", "est", "sympa", "amusant", "et", "très"],
+      answer: "il est sympa et très amusant",
+      hint: "Verb: être — sympa is invariable; très comes right before amusant",
+      verbFocus: "être + personality adjectives",
+    },
   ],
   2: [
-    { words: ["la", "j'aime", "musique"], answer: "j'aime la musique", hint: "I like + definite article (general preference)" },
-    { words: ["ne", "danser", "pas", "elle", "aime"], answer: "elle n'aime pas danser", hint: "Negation: ne...pas — elle n'aime → contraction" },
-    { words: ["heures", "il", "sept", "est"], answer: "il est sept heures", hint: "Telling time: Il est + number + heure(s)" },
+    {
+      words: ["j'aime", "la", "musique", "beaucoup", "mais", "j'aime", "aussi", "le", "sport"],
+      answer: "j'aime beaucoup la musique mais j'aime aussi le sport",
+      hint: "Verb: aimer — beaucoup after verb; aussi = also; definite articles la/le for general preferences",
+      verbFocus: "aimer + beaucoup / aussi",
+    },
+    {
+      words: ["elle", "n'aime", "pas", "regarder", "la", "télé", "ennuyeuse"],
+      answer: "elle n'aime pas regarder la télé ennuyeuse",
+      hint: "Verb: aimer — negation + infinitive; adjective ennuyeux(euse) agrees with télé (fem.)",
+      verbFocus: "ne…pas aimer + infinitive",
+    },
+    {
+      words: ["ils", "jouent", "souvent", "aux", "jeux", "vidéo", "le", "soir"],
+      answer: "ils jouent souvent aux jeux vidéo le soir",
+      hint: "Verb: jouer — adverb souvent comes after conjugated verb; jouer aux + plural noun",
+      verbFocus: "jouer + souvent",
+    },
+    {
+      words: ["tu", "étudies", "beaucoup", "mais", "tu", "es", "fatigué"],
+      answer: "tu étudies beaucoup mais tu es fatigué",
+      hint: "Two verbs: étudier (-ER) and être — connect two ideas with mais",
+      verbFocus: "étudier + être + adjective",
+    },
   ],
   3: [
-    { words: ["cours", "de", "j'ai", "maths", "un"], answer: "j'ai un cours de maths", hint: "avoir + indefinite article + subject" },
-    { words: ["pas", "n'ai", "de", "je", "stylo"], answer: "je n'ai pas de stylo", hint: "After negation: un/une → de" },
-    { words: ["souvent", "elle", "la", "écoute", "musique"], answer: "elle écoute souvent la musique", hint: "Adverb goes AFTER the verb" },
+    {
+      words: ["ma", "sœur", "est", "grande", "et", "très", "intelligente"],
+      answer: "ma sœur est grande et très intelligente",
+      hint: "Verb: être — adjectives grande/intelligente agree with sœur (feminine); très intensifies",
+      verbFocus: "être + feminine adjective agreement",
+    },
+    {
+      words: ["j'ai", "un", "cours", "de", "maths", "difficile", "le", "mardi"],
+      answer: "j'ai un cours de maths difficile le mardi",
+      hint: "Verb: avoir — difficile comes AFTER the noun it describes; le mardi = on Tuesdays",
+      verbFocus: "avoir + adjective after noun",
+    },
+    {
+      words: ["mon", "père", "est", "sympa", "et", "il", "a", "les", "yeux", "bleus"],
+      answer: "mon père est sympa et il a les yeux bleus",
+      hint: "Two verbs: être + avoir — bleus agrees with yeux (masculine plural)",
+      verbFocus: "être + avoir + color adjective",
+    },
+    {
+      words: ["nous", "n'avons", "pas", "de", "cours", "d'EPS", "aujourd'hui"],
+      answer: "nous n'avons pas de cours d'EPS aujourd'hui",
+      hint: "Verb: avoir — after ne…pas, un/une/des → de; d'EPS uses elision",
+      verbFocus: "ne…pas avoir + de",
+    },
+    {
+      words: ["sa", "petite", "sœur", "est", "amusante", "mais", "un", "peu", "timide"],
+      answer: "sa petite sœur est amusante mais un peu timide",
+      hint: "petite is a BAGS adjective (before noun); amusante/timide agree with sœur (fem.); un peu = a little",
+      verbFocus: "être + BAGS adjective + agreement",
+    },
   ],
   4: [
-    { words: ["a", "ma", "sœur", "ans", "treize"], answer: "ma sœur a treize ans", hint: "Age: avoir + number + ans" },
-    { words: ["beau", "un", "c'est", "garçon"], answer: "c'est un beau garçon", hint: "beau comes BEFORE the noun (BAGS)" },
-    { words: ["leurs", "sont", "parents", "sympas"], answer: "leurs parents sont sympas", hint: "Possessive: leur + plural = leurs" },
+    {
+      words: ["je", "vais", "faire", "du", "sport", "cet", "après-midi"],
+      answer: "je vais faire du sport cet après-midi",
+      hint: "Near future: aller + infinitive faire; du sport = partitive; cet before masc. vowel sound",
+      verbFocus: "aller + faire (near future)",
+    },
+    {
+      words: ["il", "fait", "beau", "alors", "nous", "allons", "faire", "une", "longue", "promenade"],
+      answer: "il fait beau alors nous allons faire une longue promenade",
+      hint: "Weather expression il fait beau; alors = so/therefore; longue (BAGS adj) comes before promenade",
+      verbFocus: "faire (weather) + aller + faire (activity)",
+    },
+    {
+      words: ["elle", "finit", "ses", "devoirs", "difficiles", "avant", "de", "regarder", "la", "télé"],
+      answer: "elle finit ses devoirs difficiles avant de regarder la télé",
+      hint: "Verb: finir (-IR) — difficiles agrees with devoirs (masc. plural); avant de + infinitive",
+      verbFocus: "finir (-IR) + adjective agreement",
+    },
+    {
+      words: ["ils", "vont", "au", "cinéma", "ce", "soir", "parce que", "c'est", "amusant"],
+      answer: "ils vont au cinéma ce soir parce que c'est amusant",
+      hint: "aller + au (à+le masc.); parce que = because; c'est + adjective",
+      verbFocus: "aller + au + parce que",
+    },
   ],
   5: [
-    { words: ["cinéma", "je", "au", "vais"], answer: "je vais au cinéma", hint: "aller + au (à + le) + masculine place" },
-    { words: ["allons", "nous", "étudier", "soir", "ce"], answer: "nous allons étudier ce soir", hint: "Near future: aller + infinitive" },
-    { words: ["la", "chat", "le", "table", "est", "sous"], answer: "le chat est sous la table", hint: "Preposition sous = under" },
+    {
+      words: ["je", "vais", "à la", "bibliothèque", "pour", "étudier", "tranquillement"],
+      answer: "je vais à la bibliothèque pour étudier tranquillement",
+      hint: "aller + à la (fem.); pour + infinitive = in order to; tranquillement is an adverb (-ment)",
+      verbFocus: "aller + à la + pour + infinitive",
+    },
+    {
+      words: ["le", "chat", "paresseux", "est", "sous", "la", "grande", "table"],
+      answer: "le chat paresseux est sous la grande table",
+      hint: "paresseux after noun (BANGS); sous = under; grande is BAGS — before table (fem.)",
+      verbFocus: "être + preposition + adjective placement",
+    },
+    {
+      words: ["nous", "allons", "visiter", "notre", "belle", "nouvelle", "maison", "demain"],
+      answer: "nous allons visiter notre belle nouvelle maison demain",
+      hint: "Near future; belle and nouvelle are BAGS — both before maison; stacked pre-noun adjectives",
+      verbFocus: "aller + stacked BAGS adjectives",
+    },
+    {
+      words: ["elle", "vient", "de", "Lyon", "et", "elle", "habite", "dans", "un", "grand", "appartement"],
+      answer: "elle vient de Lyon et elle habite dans un grand appartement",
+      hint: "venir de = to come from; habiter dans = to live in; grand is BAGS (before masc. noun)",
+      verbFocus: "venir + habiter + grand",
+    },
   ],
   6: [
-    { words: ["pain", "je", "du", "voudrais"], answer: "je voudrais du pain", hint: "vouloir + partitive article + food" },
-    { words: ["pas", "ne", "de", "viande", "elle", "mange"], answer: "elle ne mange pas de viande", hint: "de la → de after negation" },
-    { words: ["café", "vous", "du", "voulez"], answer: "vous voulez du café", hint: "vouloir + du + masculine food/drink" },
+    {
+      words: ["je", "voudrais", "du", "pain", "frais", "et", "du", "bon", "fromage", "s'il vous plaît"],
+      answer: "je voudrais du pain frais et du bon fromage s'il vous plaît",
+      hint: "vouloir conditionnel; du = partitive (masc.); frais after noun; bon is BAGS — before fromage",
+      verbFocus: "vouloir + partitive + adjective placement",
+    },
+    {
+      words: ["elle", "ne", "mange", "pas", "de", "viande", "rouge", "parce que", "elle", "est", "végétarienne"],
+      answer: "elle ne mange pas de viande rouge parce que elle est végétarienne",
+      hint: "After ne…pas, partitive → de; rouge after noun; parce que links cause",
+      verbFocus: "manger + ne…pas de + parce que",
+    },
+    {
+      words: ["nous", "pouvons", "commander", "une", "grande", "salade", "verte"],
+      answer: "nous pouvons commander une grande salade verte",
+      hint: "pouvoir + infinitive; grande is BAGS (before noun); verte (color) comes after noun",
+      verbFocus: "pouvoir + BAGS vs color adjective",
+    },
+    {
+      words: ["vous", "voulez", "du", "thé", "chaud", "ou", "du", "café", "fort"],
+      answer: "vous voulez du thé chaud ou du café fort",
+      hint: "vouloir + partitive du (both masc.); adjectives chaud/fort come AFTER the drink nouns",
+      verbFocus: "vouloir + partitive + post-noun adjectives",
+    },
   ],
 };
 
@@ -556,9 +690,19 @@ function WordBankExercise({
         <span>{score} correct</span>
       </div>
 
-      <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
-        Arrange the words to form a correct French sentence:
-      </p>
+      <div className="space-y-1">
+        <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
+          Arrange the words to form a correct French sentence:
+        </p>
+        {q.verbFocus && (
+          <span
+            className="inline-block text-xs px-2 py-0.5 rounded-full font-medium"
+            style={{ backgroundColor: "var(--accent-fr)", color: "white", opacity: 0.85 }}
+          >
+            Focus: {q.verbFocus}
+          </span>
+        )}
+      </div>
 
       {/* Selected words */}
       <div
