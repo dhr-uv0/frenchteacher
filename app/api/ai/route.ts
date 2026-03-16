@@ -42,7 +42,8 @@ export async function POST(req: Request) {
         orderBy: { createdAt: "desc" },
         take: 10,
       });
-      weakAreas = [...new Set<string>(recentMistakes.map((m) => m.category))];
+      const cats: string[] = recentMistakes.map((m) => m.category);
+      weakAreas = cats.filter((v, i) => cats.indexOf(v) === i);
     }
 
     const unit = context?.unit ?? student.currentUnit ?? 3;
