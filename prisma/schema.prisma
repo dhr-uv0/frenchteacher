@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Student {
+  id               String    @id @default(cuid())
+  name             String    @default("Student")
+  currentUnit      Int       @default(3)
+  streak           Int       @default(0)
+  lastStudyDate    DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  flashcardProgress FlashcardProgress[]
+  sessions          StudySession[]
+  mistakes          MistakeEntry[]
+  journalEntries    JournalEntry[]
+  customVocab       CustomVocab[]
+  unitProgress      UnitProgress[]
+}
+
+model UnitProgress {
+  id         String   @id @default(cuid())
+  studentId  String
+  unitNumber Int
+  masteryPct Float    @default(0)
+  isUnlocked Boolean  @default(true)
+  isComplete Boolean  @default(false)
+  updatedAt  DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, unitNumber])
+}
+
+model FlashcardProgress {
+  id          String   @id @default(cuid())
+  studentId   String
+  vocabKey    String
+  easeFactor  Float    @default(2.5)
+  interval    Int      @default(1)
+  repetitions Int      @default(0)
+  nextReview  DateTime @default(now())
+  lastReview  DateTime?
+  direction   String   @default("fr_en")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, vocabKey, direction])
+}
+
+model StudySession {
+  id           String   @id @default(cuid())
+  studentId    String
+  sessionType  String
+  unitNumber   Int?
+  score        Float?
+  totalItems   Int      @default(0)
+  correctItems Int      @default(0)
+  timeSpentSec Int      @default(0)
+  summary      String?
+  reviewNext   String?
+  createdAt    DateTime @default(now())
+
+  student Student @relation(fields: [studentId], references: [id])
+}
+
+model MistakeEntry {
+  id          String   @id @default(cuid())
+  studentId   String
+  vocabKey    String?
+  unitNumber  Int?
+  category    String
+  question    String
+  wrongAnswer String
+  rightAnswer String
+  explanation String?
+  reviewed    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  student Student @relation(fields: [studentId], references: [id])
+}
+
+model JournalEntry {
+  id         String   @id @default(cuid())
+  studentId  String
+  content    String
+  aiFeedback String?
+  wordCount  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id])
+}
+
+model CustomVocab {
+  id         String   @id @default(cuid())
+  studentId  String
+  french     String
+  english    String
+  unitNumber Int?
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  student Student @relation(fields: [studentId], references: [id])
+}

@@ -1,26 +1,108 @@
 @import "tailwindcss";
 
+/* ── Theme Variables ─────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #f8f9fc;
+  --surface: #ffffff;
+  --surface2: #f1f3f9;
+  --border: #e2e6ef;
+  --text: #1a1d23;
+  --text-muted: #6b7280;
+  --text-subtle: #9ca3af;
+  --accent-fr: #002395;   /* French flag blue */
+  --accent-red: #ed2939;  /* French flag red */
+  --sidebar-w: 256px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --bg: #0f1117;
+  --surface: #1a1d23;
+  --surface2: #22262f;
+  --border: #2d3240;
+  --text: #f0f2f8;
+  --text-muted: #9ca3af;
+  --text-subtle: #6b7280;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ── Base ────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+html { font-size: 16px; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  min-height: 100dvh;
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
 }
+
+/* ── French text — serif font ──────────────────────────────── */
+.fr-text {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.05em;
+}
+
+/* ── Progress bar animation ──────────────────────────────────── */
+@keyframes progressFill {
+  from { width: 0; }
+}
+
+.progress-bar {
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Flashcard flip ──────────────────────────────────────────── */
+.card-scene {
+  perspective: 1000px;
+}
+
+.card-inner {
+  position: relative;
+  transition: transform 0.5s ease;
+  transform-style: preserve-3d;
+}
+
+.card-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.card-back {
+  transform: rotateY(180deg);
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+/* ── Focus ring ──────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent-fr);
+  outline-offset: 2px;
+}
+
+/* ── Min touch target ──────────────────────────────────────────── */
+button, a, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* ── Prose / article text ────────────────────────────────────── */
+.prose-fr p { margin-bottom: 0.75rem; line-height: 1.75; }
