@@ -149,7 +149,7 @@ export async function POST(req: Request) {
         orderBy: { createdAt: "desc" },
         take: 10,
       });
-      const categories = [...new Set(recentMistakes.map((m) => m.category))];
+      const categories = [...new Set(recentMistakes.map((m: { category: string }) => m.category))];
       weakAreas = categories;
     }
 
