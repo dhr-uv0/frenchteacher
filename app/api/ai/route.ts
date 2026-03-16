@@ -42,7 +42,7 @@ export async function POST(req: Request) {
         orderBy: { createdAt: "desc" },
         take: 10,
       });
-      const cats: string[] = recentMistakes.map((m) => m.category);
+      const cats: string[] = recentMistakes.map((m: { category: string }) => m.category);
       weakAreas = cats.filter((v, i) => cats.indexOf(v) === i);
     }
 
