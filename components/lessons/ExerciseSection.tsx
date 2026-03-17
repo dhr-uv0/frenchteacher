@@ -719,8 +719,8 @@ function WordBankExercise({
           <button
             key={`sel_${i}`}
             onClick={() => selectWord(w, true)}
-            className="px-2.5 py-1 rounded-md text-sm font-medium fr-text transition-colors hover:bg-red-100 dark:hover:bg-red-950/30"
-            style={{ backgroundColor: "var(--surface)", border: "1px solid var(--border)", color: "var(--text)" }}
+            className="px-3 py-1.5 rounded-lg text-sm font-semibold fr-text transition-all hover:scale-105 hover:opacity-70 active:scale-95"
+            style={{ backgroundColor: "#002395", border: "1px solid #001a6e", color: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }}
           >
             {w}
           </button>
@@ -733,11 +733,12 @@ function WordBankExercise({
           <button
             key={`avail_${i}`}
             onClick={() => selectWord(w, false)}
-            className="px-2.5 py-1 rounded-md text-sm font-medium fr-text transition-colors hover:bg-blue-50 dark:hover:bg-blue-950/30"
+            className="px-3 py-1.5 rounded-lg text-sm font-semibold fr-text transition-all hover:scale-105 hover:shadow-md active:scale-95"
             style={{
-              backgroundColor: "var(--surface)",
-              border: "1px solid var(--accent-fr)",
-              color: "var(--accent-fr)",
+              backgroundColor: "#e8edf8",
+              border: "1px solid #b8c8e8",
+              color: "#1a2f6e",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
             }}
           >
             {w}
