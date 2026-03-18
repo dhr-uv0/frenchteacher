@@ -10,7 +10,7 @@ import type { SRSCard } from "@/lib/srs";
 import { Volume2, RotateCcw, ChevronRight } from "lucide-react";
 
 type Direction = "fr_en" | "en_fr";
-type FilterUnit = "all" | "due" | "glue" | "1" | "2" | "3" | "4" | "5" | "6";
+type FilterUnit = "all" | "due" | "glue" | "custom" | "1" | "2" | "3" | "4" | "5" | "6";
 
 interface SessionSummary {
   total: number;
@@ -31,6 +31,8 @@ export default function FlashcardSession() {
   const [startTime, setStartTime] = useState(0);
   const [loading, setLoading] = useState(false);
   const [customVocab, setCustomVocab] = useState<VocabItem[]>([]);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [pickerUnit, setPickerUnit] = useState<number>(3);
 
   // Load custom vocab from localStorage
   useEffect(() => {
@@ -58,6 +60,9 @@ export default function FlashcardSession() {
         return ALL_VOCAB.filter((v) => dueKeys.has(v.key));
       }
       if (f === "glue") return GLUE_WORDS;
+      if (f === "custom") {
+        return [...ALL_VOCAB, ...customVocab].filter(v => selectedKeys.has(v.key));
+      }
       if (f === "all") return [...ALL_VOCAB, ...customVocab];
       const unit = parseInt(f, 10);
       return [...getVocabByUnit(unit), ...customVocab.filter((v) => v.unit === unit)];
@@ -231,7 +236,7 @@ export default function FlashcardSession() {
             Card Set
           </label>
           <div className="grid grid-cols-4 gap-2">
-            {(["due", "all", "glue", "1", "2", "3", "4", "5", "6"] as FilterUnit[]).map((f) => (
+            {(["due", "all", "glue", "custom", "1", "2", "3", "4", "5", "6"] as FilterUnit[]).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
@@ -243,15 +248,54 @@ export default function FlashcardSession() {
                 )}
                 style={{ color: filter === f ? "white" : "var(--text)" }}
               >
-                {f === "due" ? "Due Now" : f === "all" ? "All" : f === "glue" ? "Glue" : `Unit ${f}`}
+                {f === "due" ? "Due Now" : f === "all" ? "All" : f === "glue" ? "Glue" : f === "custom" ? "Custom" : `Unit ${f}`}
               </button>
             ))}
           </div>
+
+          {filter === "custom" && (
+            <div className="space-y-2 border rounded-xl p-3" style={{ borderColor: "var(--border)", backgroundColor: "var(--surface)" }}>
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium" style={{ color: "var(--text)" }}>Pick cards for your custom set:</p>
+                <div className="flex gap-2">
+                  <button onClick={() => { const all = ALL_VOCAB.filter(v => v.unit === pickerUnit); setSelectedKeys(new Set(all.map(v => v.key))); }} className="text-xs px-2 py-1 rounded" style={{ color: "var(--accent-fr)" }}>All</button>
+                  <button onClick={() => setSelectedKeys(new Set())} className="text-xs px-2 py-1 rounded" style={{ color: "var(--text-muted)" }}>Clear</button>
+                </div>
+              </div>
+              {/* Unit filter for picker */}
+              <div className="flex flex-wrap gap-1">
+                {[1,2,3,4,5,6].map(u => (
+                  <button key={u} onClick={() => setPickerUnit(u)} className={cn("px-2 py-0.5 rounded text-xs", pickerUnit === u ? "bg-[var(--accent-fr)] text-white" : "border text-[var(--text-muted)]")} style={{ borderColor: "var(--border)" }}>U{u}</button>
+                ))}
+              </div>
+              {/* Scrollable vocab list */}
+              <div className="max-h-48 overflow-y-auto space-y-1">
+                {ALL_VOCAB.filter(v => v.unit === pickerUnit).map(v => (
+                  <label key={v.key} className="flex items-center gap-2 px-2 py-1 rounded cursor-pointer hover:bg-[var(--surface2)]">
+                    <input
+                      type="checkbox"
+                      checked={selectedKeys.has(v.key)}
+                      onChange={e => {
+                        const next = new Set(selectedKeys);
+                        if (e.target.checked) next.add(v.key);
+                        else next.delete(v.key);
+                        setSelectedKeys(next);
+                      }}
+                      className="rounded"
+                    />
+                    <span className="fr-text text-sm" style={{ color: "var(--text)" }}>{v.french}</span>
+                    <span className="text-xs" style={{ color: "var(--text-muted)" }}>— {v.english}</span>
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>{selectedKeys.size} card{selectedKeys.size !== 1 ? "s" : ""} selected</p>
+            </div>
+          )}
         </div>
 
         <button
           onClick={startSession}
-          disabled={loading}
+          disabled={loading || (filter === "custom" && selectedKeys.size === 0)}
           className="w-full py-3 rounded-xl text-white font-semibold text-sm transition-opacity disabled:opacity-60"
           style={{ backgroundColor: "var(--accent-fr)" }}
         >
