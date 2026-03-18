@@ -219,7 +219,6 @@ export const VOCAB_UNIT1: VocabItem[] = [
   { key: "u1_calme", french: "calme", english: "calm / quiet", partOfSpeech: "adjective", unit: 1 },
   { key: "u1_sociable", french: "sociable", english: "sociable / outgoing", partOfSpeech: "adjective", unit: 1 },
   // Indefinite articles
-  { key: "u1_un_art", french: "un", english: "a / an (masculine singular)", partOfSpeech: "article", unit: 1 },
   { key: "u1_une_art", french: "une", english: "a / an (feminine singular)", partOfSpeech: "article", unit: 1 },
   { key: "u1_des_art", french: "des", english: "some / (plural indefinite)", partOfSpeech: "article", unit: 1 },
   // Être
@@ -391,8 +390,6 @@ export const VOCAB_UNIT3: VocabItem[] = [
   { key: "u3_quel_age", french: "Quel âge as-tu ?", english: "How old are you?", partOfSpeech: "phrase", unit: 3, tricky: true },
   { key: "u3_j_ai_ans", french: "J'ai… ans.", english: "I am… years old.", partOfSpeech: "phrase", unit: 3 },
   // Adjectives (user-requested)
-  { key: "u3_jeune2", french: "jeune", english: "young", partOfSpeech: "adjective", unit: 3 },
-  { key: "u3_mince2", french: "mince", english: "thin / slim", partOfSpeech: "adjective", unit: 3 },
   { key: "u3_patient", french: "patient / patiente", english: "patient", partOfSpeech: "adjective", unit: 3 },
   { key: "u3_roux", french: "roux / rousse", english: "red-headed / ginger", partOfSpeech: "adjective", unit: 3, tricky: true, audioHint: "roux (m) ROO, rousse (f) ROOS" },
   { key: "u3_strict", french: "strict / stricte", english: "strict", partOfSpeech: "adjective", unit: 3 },
@@ -405,14 +402,8 @@ export const VOCAB_UNIT3: VocabItem[] = [
   { key: "u3_dejeuner", french: "déjeuner", english: "to eat lunch", partOfSpeech: "verb", unit: 3, tricky: true, audioHint: "day-zhuh-NAY" },
   { key: "u3_enseigner", french: "enseigner", english: "to teach", partOfSpeech: "verb", unit: 3, tricky: true, audioHint: "on-seh-NYAY" },
   { key: "u3_faire_attention", french: "faire attention", english: "to pay attention", partOfSpeech: "phrase", unit: 3 },
-  { key: "u3_travailler", french: "travailler", english: "to work / to study hard", partOfSpeech: "verb", unit: 3, tricky: true, audioHint: "trah-vah-YAY" },
   { key: "u3_faire_les_devoirs", french: "faire les devoirs", english: "to do homework", partOfSpeech: "phrase", unit: 3 },
   // Adverbs (user-requested)
-  { key: "u3_si", french: "si", english: "so (intensifier)", partOfSpeech: "adverb", unit: 3 },
-  { key: "u3_vraiment", french: "vraiment", english: "really / truly", partOfSpeech: "adverb", unit: 3 },
-  { key: "u3_toujours2", french: "toujours", english: "always", partOfSpeech: "adverb", unit: 3 },
-  { key: "u3_trop", french: "trop", english: "too / too much", partOfSpeech: "adverb", unit: 3 },
-  { key: "u3_rarement2", french: "rarement", english: "rarely", partOfSpeech: "adverb", unit: 3 },
   { key: "u3_plutot", french: "plutôt", english: "rather / quite", partOfSpeech: "adverb", unit: 3, tricky: true, audioHint: "ploo-TOH" },
 ];
 
@@ -425,7 +416,6 @@ export const VOCAB_UNIT4: VocabItem[] = [
   { key: "u4_le_soir", french: "le soir", english: "the evening", partOfSpeech: "noun", unit: 4, gender: "m" },
   { key: "u4_le_week_end", french: "le week-end", english: "the weekend", partOfSpeech: "noun", unit: 4, gender: "m" },
   { key: "u4_dabord", french: "d'abord", english: "first / firstly", partOfSpeech: "adverb", unit: 4 },
-  { key: "u4_ensuite", french: "ensuite", english: "then / next", partOfSpeech: "adverb", unit: 4 },
   { key: "u4_enfin", french: "enfin", english: "finally", partOfSpeech: "adverb", unit: 4 },
   // -IR verbs
   { key: "u4_finir", french: "finir", english: "to finish", partOfSpeech: "verb", unit: 4 },
@@ -433,8 +423,6 @@ export const VOCAB_UNIT4: VocabItem[] = [
   { key: "u4_reussir", french: "réussir", english: "to succeed / to pass (a test)", partOfSpeech: "verb", unit: 4, tricky: true },
   // Faire expressions
   { key: "u4_faire", french: "faire", english: "to do / to make", partOfSpeech: "verb", unit: 4, tricky: true, audioHint: "FAIR" },
-  { key: "u4_faire_du_sport", french: "faire du sport", english: "to play sports", partOfSpeech: "phrase", unit: 4 },
-  { key: "u4_faire_les_devoirs", french: "faire les devoirs", english: "to do homework", partOfSpeech: "phrase", unit: 4 },
   { key: "u4_faire_une_promenade", french: "faire une promenade", english: "to take a walk", partOfSpeech: "phrase", unit: 4 },
   { key: "u4_faire_du_velo", french: "faire du vélo", english: "to ride a bike", partOfSpeech: "phrase", unit: 4 },
   // Weather
@@ -488,14 +476,7 @@ export const VOCAB_UNIT5: VocabItem[] = [
   { key: "u5_en_face_de", french: "en face de", english: "across from / facing", partOfSpeech: "preposition", unit: 5 },
   { key: "u5_entre", french: "entre", english: "between", partOfSpeech: "preposition", unit: 5 },
   // Aller contractions
-  { key: "u5_aller", french: "aller", english: "to go", partOfSpeech: "verb", unit: 5, tricky: true },
-  { key: "u5_au", french: "au (à + le)", english: "to the (masc. sing.)", partOfSpeech: "contraction", unit: 5, tricky: true },
-  { key: "u5_aux", french: "aux (à + les)", english: "to the (plural)", partOfSpeech: "contraction", unit: 5, tricky: true },
-  { key: "u5_a_la", french: "à la", english: "to the (fem. sing.)", partOfSpeech: "contraction", unit: 5 },
   { key: "u5_a_l", french: "à l'", english: "to the (before vowel/h)", partOfSpeech: "contraction", unit: 5 },
-  // Near future
-  { key: "u5_futur_proche", french: "aller + infinitif", english: "near future (going to…)", partOfSpeech: "structure", unit: 5, tricky: true },
-  { key: "u5_je_vais", french: "Je vais…", english: "I am going to…", partOfSpeech: "phrase", unit: 5 },
   // Venir
   { key: "u5_venir", french: "venir", english: "to come", partOfSpeech: "verb", unit: 5, tricky: true },
 ];
@@ -527,7 +508,6 @@ export const VOCAB_UNIT6: VocabItem[] = [
   { key: "u6_du", french: "du (de + le)", english: "some (masc. sing.)", partOfSpeech: "article", unit: 6, tricky: true },
   { key: "u6_de_la_art", french: "de la", english: "some (fem. sing.)", partOfSpeech: "article", unit: 6 },
   { key: "u6_de_l_art", french: "de l'", english: "some (before vowel/h)", partOfSpeech: "article", unit: 6 },
-  { key: "u6_des_art_pl", french: "des", english: "some (plural)", partOfSpeech: "article", unit: 6 },
   // Restaurant
   { key: "u6_le_menu", french: "le menu", english: "the menu", partOfSpeech: "noun", unit: 6, gender: "m" },
   { key: "u6_laddition", french: "l'addition", english: "the bill / check", partOfSpeech: "noun", unit: 6, gender: "f" },
