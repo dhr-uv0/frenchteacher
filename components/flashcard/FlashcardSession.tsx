@@ -67,7 +67,7 @@ export default function FlashcardSession() {
       const unit = parseInt(f, 10);
       return [...getVocabByUnit(unit), ...customVocab.filter((v) => v.unit === unit)];
     },
-    [customVocab]
+    [customVocab, selectedKeys]
   );
 
   const startSession = () => {
