@@ -77,6 +77,13 @@ export interface CustomVocab {
   createdAt: string;
 }
 
+export interface SavedSet {
+  id: string;
+  name: string;
+  keys: string[];
+  createdAt: string;
+}
+
 // ── Storage keys ──────────────────────────────────────────────────────────────
 
 const KEYS = {
@@ -87,6 +94,7 @@ const KEYS = {
   sessions: "fm_sessions",
   journal: "fm_journal",
   customVocab: "fm_custom_vocab",
+  savedSets: "fm_saved_sets",
 };
 
 function isClient(): boolean {
@@ -359,4 +367,28 @@ export function deleteCustomVocab(id: string): void {
     KEYS.customVocab,
     all.filter((v) => v.id !== id)
   );
+}
+
+// ── Saved Sets ────────────────────────────────────────────────────────────────
+
+export function getSavedSets(): SavedSet[] {
+  return getItem<SavedSet[]>(KEYS.savedSets) ?? [];
+}
+
+export function saveSet(name: string, keys: string[]): SavedSet {
+  const all = getSavedSets();
+  const entry: SavedSet = {
+    id: uid(),
+    name: name.trim() || "Untitled Set",
+    keys,
+    createdAt: new Date().toISOString(),
+  };
+  all.unshift(entry);
+  setItem(KEYS.savedSets, all);
+  return entry;
+}
+
+export function deleteSavedSet(id: string): void {
+  const all = getSavedSets();
+  setItem(KEYS.savedSets, all.filter((s) => s.id !== id));
 }

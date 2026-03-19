@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { ALL_VOCAB, GLUE_WORDS, getVocabByUnit } from "@/data/curriculum";
 import type { VocabItem } from "@/data/curriculum";
-import { getCustomVocab, getDueFlashcards, upsertFlashcard, addMistake, addSession } from "@/lib/store";
+import { getCustomVocab, getDueFlashcards, upsertFlashcard, addMistake, addSession, getSavedSets, saveSet, deleteSavedSet } from "@/lib/store";
+import type { SavedSet } from "@/lib/store";
 import { calculateNextReview, qualityFromButton } from "@/lib/srs";
 import type { SRSCard } from "@/lib/srs";
 import { Volume2, RotateCcw } from "lucide-react";
@@ -35,9 +36,13 @@ export default function FlashcardSession() {
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [pickerUnit, setPickerUnit] = useState<number>(3);
   const [missedCards, setMissedCards] = useState<VocabItem[]>([]);
+  const [savedSets, setSavedSets] = useState<SavedSet[]>([]);
+  const [saveName, setSaveName] = useState("");
+  const [showSaveInput, setShowSaveInput] = useState(false);
 
   // Load custom vocab from localStorage
   useEffect(() => {
+    setSavedSets(getSavedSets());
     const data = getCustomVocab();
     const mapped: VocabItem[] = data.map((v) => ({
       key: `custom_${v.id}`,
@@ -99,6 +104,24 @@ export default function FlashcardSession() {
     setStartTime(Date.now());
     setMissedCards([]);
   };
+
+  function handleSaveSet() {
+    if (selectedKeys.size === 0) return;
+    saveSet(saveName, [...selectedKeys]);
+    setSavedSets(getSavedSets());
+    setSaveName("");
+    setShowSaveInput(false);
+  }
+
+  function handleLoadSet(s: SavedSet) {
+    setSelectedKeys(new Set(s.keys));
+    setFilter("custom");
+  }
+
+  function handleDeleteSet(id: string) {
+    deleteSavedSet(id);
+    setSavedSets(getSavedSets());
+  }
 
   const handleFlip = () => setFlipped((f) => !f);
 
@@ -336,10 +359,68 @@ export default function FlashcardSession() {
                   </label>
                 ))}
               </div>
-              <p className="text-xs" style={{ color: "var(--text-muted)" }}>{selectedKeys.size} card{selectedKeys.size !== 1 ? "s" : ""} selected</p>
+              <div className="flex items-center justify-between pt-1">
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>{selectedKeys.size} card{selectedKeys.size !== 1 ? "s" : ""} selected</p>
+                {selectedKeys.size > 0 && (
+                  showSaveInput ? (
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        autoFocus
+                        value={saveName}
+                        onChange={e => setSaveName(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") handleSaveSet(); if (e.key === "Escape") setShowSaveInput(false); }}
+                        placeholder="Set name…"
+                        className="text-xs px-2 py-1 rounded border w-32"
+                        style={{ borderColor: "var(--border)", backgroundColor: "var(--bg)", color: "var(--text)" }}
+                      />
+                      <button onClick={handleSaveSet} className="text-xs px-2 py-1 rounded font-medium" style={{ backgroundColor: "var(--accent-fr)", color: "white" }}>Save</button>
+                      <button onClick={() => setShowSaveInput(false)} className="text-xs px-2 py-1 rounded" style={{ color: "var(--text-muted)" }}>✕</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => setShowSaveInput(true)} className="text-xs px-2 py-1 rounded border" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
+                      Save set…
+                    </button>
+                  )
+                )}
+              </div>
             </div>
           )}
         </div>
+
+        {/* Saved sets */}
+        {savedSets.length > 0 && (
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: "var(--text-muted)" }}>
+              Saved Sets
+            </label>
+            <div className="space-y-2">
+              {savedSets.map(s => (
+                <div key={s.id} className="flex items-center justify-between px-3 py-2 rounded-lg border" style={{ borderColor: "var(--border)", backgroundColor: "var(--surface)" }}>
+                  <div>
+                    <span className="text-sm font-medium" style={{ color: "var(--text)" }}>{s.name}</span>
+                    <span className="text-xs ml-2" style={{ color: "var(--text-muted)" }}>{s.keys.length} cards</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleLoadSet(s)}
+                      className="text-xs px-2.5 py-1 rounded font-medium"
+                      style={{ backgroundColor: "var(--accent-fr)", color: "white" }}
+                    >
+                      Load
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSet(s.id)}
+                      className="text-xs px-2 py-1 rounded"
+                      style={{ color: "#ef4444" }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <button
           onClick={startSession}
