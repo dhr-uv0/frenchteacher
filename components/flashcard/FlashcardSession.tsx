@@ -7,7 +7,7 @@ import type { VocabItem } from "@/data/curriculum";
 import { getCustomVocab, getDueFlashcards, upsertFlashcard, addMistake, addSession } from "@/lib/store";
 import { calculateNextReview, qualityFromButton } from "@/lib/srs";
 import type { SRSCard } from "@/lib/srs";
-import { Volume2, RotateCcw, ChevronRight } from "lucide-react";
+import { Volume2, RotateCcw } from "lucide-react";
 
 type Direction = "fr_en" | "en_fr";
 type FilterUnit = "all" | "due" | "glue" | "custom" | "1" | "2" | "3" | "4" | "5" | "6";
@@ -34,6 +34,7 @@ export default function FlashcardSession() {
   const [customVocab, setCustomVocab] = useState<VocabItem[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [pickerUnit, setPickerUnit] = useState<number>(3);
+  const [missedCards, setMissedCards] = useState<VocabItem[]>([]);
 
   // Load custom vocab from localStorage
   useEffect(() => {
@@ -83,7 +84,20 @@ export default function FlashcardSession() {
     setSummary(null);
     setSessionStarted(true);
     setStartTime(Date.now());
+    setMissedCards([]);
     setLoading(false);
+  };
+
+  const startMissedSession = (missed: VocabItem[]) => {
+    const shuffled = [...missed].sort(() => Math.random() - 0.5);
+    setDeck(shuffled);
+    setIndex(0);
+    setFlipped(false);
+    setSessionStats({ correct: 0, again: 0 });
+    setSummary(null);
+    setSessionStarted(true);
+    setStartTime(Date.now());
+    setMissedCards([]);
   };
 
   const handleFlip = () => setFlipped((f) => !f);
@@ -91,9 +105,22 @@ export default function FlashcardSession() {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (!sessionStarted || summary) return;
-      if (e.key === " " || e.key === "Enter") handleFlip();
+      if (e.key === " " || e.key === "Enter") {
+        e.preventDefault();
+        handleFlip();
+      }
+      if (flipped) {
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          handleResponse("again");
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          handleResponse("got_it");
+        }
+      }
     },
-    [sessionStarted, summary]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sessionStarted, summary, flipped]
   );
 
   useEffect(() => {
@@ -109,6 +136,15 @@ export default function FlashcardSession() {
       correct: prev.correct + (correct ? 1 : 0),
       again: prev.again + (correct ? 0 : 1),
     }));
+
+    // Track missed cards
+    if (!correct) {
+      setMissedCards((prev) => {
+        // Avoid duplicates
+        if (prev.some((c) => c.key === card.key)) return prev;
+        return [...prev, card];
+      });
+    }
 
     // Update SRS via store
     try {
@@ -196,10 +232,14 @@ export default function FlashcardSession() {
   const card = deck[index];
   const progress = deck.length > 0 ? ((index) / deck.length) * 100 : 0;
 
+  // Progress dots (up to 20)
+  const MAX_DOTS = 20;
+  const showDots = deck.length <= MAX_DOTS;
+
   // ── Setup screen ──────────────────────────────────────────────────────────
   if (!sessionStarted) {
     return (
-      <div className="max-w-xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6">
         <div>
           <h1 className="text-2xl font-bold" style={{ color: "var(--text)" }}>
             Flashcard Review
@@ -243,7 +283,7 @@ export default function FlashcardSession() {
           <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: "var(--text-muted)" }}>
             Card Set
           </label>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {(["due", "all", "glue", "custom", "1", "2", "3", "4", "5", "6"] as FilterUnit[]).map((f) => (
               <button
                 key={f}
@@ -262,7 +302,7 @@ export default function FlashcardSession() {
           </div>
 
           {filter === "custom" && (
-            <div className="space-y-2 border rounded-xl p-3" style={{ borderColor: "var(--border)", backgroundColor: "var(--surface)" }}>
+            <div className="space-y-2 border rounded-xl p-3 mt-3" style={{ borderColor: "var(--border)", backgroundColor: "var(--surface)" }}>
               <div className="flex items-center justify-between">
                 <p className="text-xs font-medium" style={{ color: "var(--text)" }}>Pick cards for your custom set:</p>
                 <div className="flex gap-2">
@@ -317,7 +357,7 @@ export default function FlashcardSession() {
   if (summary) {
     const pct = Math.round((summary.correct / summary.total) * 100);
     return (
-      <div className="max-w-lg mx-auto text-center space-y-6">
+      <div className="max-w-4xl mx-auto text-center space-y-6">
         <div className="rounded-2xl p-8 space-y-4" style={{ backgroundColor: "var(--surface)", border: "1px solid var(--border)" }}>
           <div className="text-5xl">{pct >= 80 ? "🎉" : pct >= 60 ? "👍" : "💪"}</div>
           <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>Session Complete!</h2>
@@ -344,7 +384,7 @@ export default function FlashcardSession() {
           )}
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={() => { setSessionStarted(false); setSummary(null); }}
             className="flex-1 py-2.5 rounded-xl border text-sm font-medium transition-colors hover:bg-[var(--surface2)]"
@@ -352,6 +392,15 @@ export default function FlashcardSession() {
           >
             Change Settings
           </button>
+          {missedCards.length > 0 && (
+            <button
+              onClick={() => startMissedSession(missedCards)}
+              className="flex-1 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors hover:bg-red-50 dark:hover:bg-red-950/20"
+              style={{ borderColor: "#ef4444", color: "#ef4444" }}
+            >
+              Study Missed ({missedCards.length})
+            </button>
+          )}
           <button
             onClick={startSession}
             className="flex-1 py-2.5 rounded-xl text-white text-sm font-medium"
@@ -371,40 +420,68 @@ export default function FlashcardSession() {
   const backText = direction === "fr_en" ? card.english : card.french;
 
   return (
-    <div className="max-w-lg mx-auto space-y-4">
-      {/* Progress */}
+    <div className="max-w-4xl mx-auto space-y-4">
+      {/* Progress dots / numbers */}
       <div className="flex items-center justify-between text-sm" style={{ color: "var(--text-muted)" }}>
-        <span>{index + 1} / {deck.length}</span>
         <span className="capitalize">{direction === "fr_en" ? "Recognition" : "Production"}</span>
+        <span>{index + 1} / {deck.length}</span>
       </div>
-      <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "var(--surface2)" }}>
-        <div
-          className="h-full bg-[var(--accent-fr)] rounded-full transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
+
+      {showDots ? (
+        <div className="flex items-center justify-center gap-1.5 flex-wrap">
+          {deck.map((_, i) => (
+            <div
+              key={i}
+              className={cn(
+                "rounded-full transition-all duration-200",
+                i < index
+                  ? "w-2.5 h-2.5 bg-[var(--accent-fr)]"
+                  : i === index
+                  ? "w-3 h-3 bg-[var(--accent-fr)] ring-2 ring-[var(--accent-fr)] ring-offset-2 ring-offset-[var(--bg)]"
+                  : "w-2.5 h-2.5 border border-[var(--border)]"
+              )}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "var(--surface2)" }}>
+          <div
+            className="h-full bg-[var(--accent-fr)] rounded-full transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      )}
 
       {/* Flashcard */}
       <div
         className="card-scene"
-        style={{ height: "280px" }}
+        style={{ height: "400px" }}
         onClick={handleFlip}
       >
         <div className={cn("card-inner w-full h-full cursor-pointer", flipped && "is-flipped", resetting && "no-transition")}>
           {/* Front */}
           <div
-            className="card-front flex flex-col items-center justify-center rounded-2xl p-6 select-none"
+            className="card-front flex flex-col items-center justify-center rounded-2xl p-8 select-none"
             style={{
               backgroundColor: "var(--surface)",
               border: "2px solid var(--border)",
-              height: "280px",
+              height: "400px",
             }}
           >
+            {/* Unit badge */}
+            {card.unit > 0 && (
+              <span
+                className="absolute top-5 left-5 text-xs font-semibold px-2 py-0.5 rounded-full"
+                style={{ backgroundColor: "var(--surface2)", color: "var(--text-muted)" }}
+              >
+                Unit {card.unit}
+              </span>
+            )}
             <p className="text-xs uppercase tracking-wider mb-4" style={{ color: "var(--text-muted)" }}>
               {direction === "fr_en" ? "French" : "English"} · {card.partOfSpeech}
             </p>
             <p
-              className={cn("text-center font-semibold leading-snug", direction === "fr_en" ? "fr-text text-3xl" : "text-2xl")}
+              className={cn("text-center font-semibold leading-snug", direction === "fr_en" ? "fr-text text-4xl" : "text-3xl")}
               style={{ color: "var(--text)" }}
             >
               {frontText}
@@ -412,32 +489,29 @@ export default function FlashcardSession() {
             {direction === "fr_en" && card.tricky && (
               <button
                 onClick={(e) => { e.stopPropagation(); speakFrench(card.french); }}
-                className="mt-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors hover:bg-[var(--surface2)]"
+                className="mt-6 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors hover:bg-[var(--surface2)]"
                 style={{ color: "var(--accent-fr)" }}
               >
                 <Volume2 className="h-3.5 w-3.5" />
                 {card.audioHint ?? "Hear pronunciation"}
               </button>
             )}
-            <p className="mt-6 text-xs" style={{ color: "var(--text-subtle)" }}>
-              Tap or press Space to flip
-            </p>
           </div>
 
           {/* Back */}
           <div
-            className="card-back flex flex-col items-center justify-center rounded-2xl p-6 select-none"
+            className="card-back flex flex-col items-center justify-center rounded-2xl p-8 select-none"
             style={{
               backgroundColor: "var(--surface2)",
               border: "2px solid var(--accent-fr)",
-              height: "280px",
+              height: "400px",
             }}
           >
             <p className="text-xs uppercase tracking-wider mb-4" style={{ color: "var(--text-muted)" }}>
               {direction === "fr_en" ? "English" : "French"}
             </p>
             <p
-              className={cn("text-center font-semibold leading-snug", direction === "en_fr" ? "fr-text text-3xl" : "text-2xl")}
+              className={cn("text-center font-semibold leading-snug", direction === "en_fr" ? "fr-text text-4xl" : "text-3xl")}
               style={{ color: "var(--text)" }}
             >
               {backText}
@@ -445,7 +519,7 @@ export default function FlashcardSession() {
             {direction === "en_fr" && (
               <button
                 onClick={(e) => { e.stopPropagation(); speakFrench(card.french); }}
-                className="mt-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors hover:bg-[var(--surface)]"
+                className="mt-6 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors hover:bg-[var(--surface)]"
                 style={{ color: "var(--accent-fr)" }}
               >
                 <Volume2 className="h-3.5 w-3.5" />
@@ -455,6 +529,13 @@ export default function FlashcardSession() {
           </div>
         </div>
       </div>
+
+      {/* Keyboard hint */}
+      <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
+        {flipped
+          ? "← Again · Got it →"
+          : "Space to flip · ← Again · Got it →"}
+      </p>
 
       {/* Response buttons — only shown after flip */}
       {flipped ? (
