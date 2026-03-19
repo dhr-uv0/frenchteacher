@@ -30,6 +30,7 @@ export default function FlashcardSession() {
   const [sessionStats, setSessionStats] = useState({ correct: 0, again: 0 });
   const [startTime, setStartTime] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [customVocab, setCustomVocab] = useState<VocabItem[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [pickerUnit, setPickerUnit] = useState<number>(3);
@@ -172,8 +173,15 @@ export default function FlashcardSession() {
         });
       } catch {}
     } else {
-      setIndex((i) => i + 1);
+      // Snap back to front instantly (no reverse-flip animation) then show next card
+      setResetting(true);
       setFlipped(false);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setResetting(false);
+          setIndex((i) => i + 1);
+        });
+      });
     }
   }
 
@@ -382,7 +390,7 @@ export default function FlashcardSession() {
         style={{ height: "280px" }}
         onClick={handleFlip}
       >
-        <div className={cn("card-inner w-full h-full cursor-pointer", flipped && "is-flipped")}>
+        <div className={cn("card-inner w-full h-full cursor-pointer", flipped && "is-flipped", resetting && "no-transition")}>
           {/* Front */}
           <div
             className="card-front flex flex-col items-center justify-center rounded-2xl p-6 select-none"

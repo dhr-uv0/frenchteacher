@@ -65,6 +65,10 @@ body {
   will-change: transform;
 }
 
+.card-inner.no-transition {
+  transition: none !important;
+}
+
 .card-inner.is-flipped {
   transform: rotateY(180deg);
 }
