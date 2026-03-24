@@ -77,8 +77,8 @@ export const UNITS: UnitMeta[] = [
   },
   {
     number: 3,
-    title: "À l'école et en famille",
-    subtitle: "School life, family, opinions, and descriptions",
+    title: "À l'école, en famille et chez moi",
+    subtitle: "School life, family, descriptions, and the home",
     color: "violet",
     topics: [
       "School subjects & opinions",
@@ -92,6 +92,10 @@ export const UNITS: UnitMeta[] = [
       "Frequency adverbs",
       "Colors",
       "School supplies",
+      "Types of housing",
+      "Rooms of the house (les pièces)",
+      "Furniture & household objects",
+      "Prepositions of location",
     ],
   },
   {
@@ -111,15 +115,16 @@ export const UNITS: UnitMeta[] = [
   },
   {
     number: 5,
-    title: "Chez moi",
-    subtitle: "Home, places, and future plans",
+    title: "En ville et à la maison",
+    subtitle: "Going places, home activities, and irregular verbs",
     color: "rose",
     topics: [
-      "House & room vocabulary",
-      "Prepositions of place",
-      "Aller with contractions (au/aux/à la/à l')",
-      "Near future (aller + infinitive)",
-      "Verb venir",
+      "Describing your home",
+      "Floors & layout",
+      "Activities at home",
+      "Irregular -IR verbs (dormir, sortir, partir)",
+      "Verb venir & venir de",
+      "Contractions with de (du / de la / de l')",
     ],
   },
   {
@@ -405,6 +410,51 @@ export const VOCAB_UNIT3: VocabItem[] = [
   { key: "u3_faire_les_devoirs", french: "faire les devoirs", english: "to do homework", partOfSpeech: "phrase", unit: 3 },
   // Adverbs (user-requested)
   { key: "u3_plutot", french: "plutôt", english: "rather / quite", partOfSpeech: "adverb", unit: 3, tricky: true, audioHint: "ploo-TOH" },
+
+  // ── Communiquons 3 — La maison ────────────────────────────────────────────
+  // Types of home
+  { key: "u3_habiter", french: "habiter", english: "to live (in)", partOfSpeech: "verb", unit: 3 },
+  { key: "u3_une_maison", french: "une maison", english: "a house", partOfSpeech: "noun", unit: 3, gender: "f" },
+  { key: "u3_un_appartement", french: "un appartement", english: "an apartment", partOfSpeech: "noun", unit: 3, gender: "m", tricky: true, audioHint: "ah-par-tuh-MON" },
+  { key: "u3_un_immeuble", french: "un immeuble", english: "an apartment building", partOfSpeech: "noun", unit: 3, gender: "m", tricky: true, audioHint: "ee-MUBL" },
+  { key: "u3_une_villa", french: "une villa", english: "a villa / vacation home", partOfSpeech: "noun", unit: 3, gender: "f" },
+  // Les pièces (rooms)
+  { key: "u3_la_chambre", french: "la chambre", english: "the bedroom", partOfSpeech: "noun", unit: 3, gender: "f" },
+  { key: "u3_la_salle_de_bains", french: "la salle de bains", english: "the bathroom", partOfSpeech: "noun", unit: 3, gender: "f" },
+  { key: "u3_la_cuisine", french: "la cuisine", english: "the kitchen", partOfSpeech: "noun", unit: 3, gender: "f" },
+  { key: "u3_le_salon", french: "le salon", english: "the living room", partOfSpeech: "noun", unit: 3, gender: "m" },
+  { key: "u3_la_salle_a_manger", french: "la salle à manger", english: "the dining room", partOfSpeech: "noun", unit: 3, gender: "f" },
+  { key: "u3_le_couloir", french: "le couloir", english: "the hallway / corridor", partOfSpeech: "noun", unit: 3, gender: "m" },
+  { key: "u3_les_toilettes", french: "les toilettes", english: "the restroom / toilet", partOfSpeech: "noun", unit: 3, tricky: true, audioHint: "lay twah-LET" },
+  { key: "u3_lentree", french: "l'entrée", english: "the entryway / foyer", partOfSpeech: "noun", unit: 3, gender: "f" },
+  { key: "u3_le_garage", french: "le garage", english: "the garage", partOfSpeech: "noun", unit: 3, gender: "m" },
+  { key: "u3_le_jardin", french: "le jardin", english: "the garden / yard", partOfSpeech: "noun", unit: 3, gender: "m" },
+  { key: "u3_le_sous_sol", french: "le sous-sol", english: "the basement", partOfSpeech: "noun", unit: 3, gender: "m" },
+  { key: "u3_le_grenier", french: "le grenier", english: "the attic", partOfSpeech: "noun", unit: 3, gender: "m" },
+  // Les meubles (furniture)
+  { key: "u3_le_lit", french: "le lit", english: "the bed", partOfSpeech: "noun", unit: 3, gender: "m" },
+  { key: "u3_la_table", french: "la table", english: "the table", partOfSpeech: "noun", unit: 3, gender: "f" },
+  { key: "u3_la_chaise", french: "la chaise", english: "the chair", partOfSpeech: "noun", unit: 3, gender: "f" },
+  { key: "u3_le_canape", french: "le canapé", english: "the sofa / couch", partOfSpeech: "noun", unit: 3, gender: "m" },
+  { key: "u3_le_fauteuil", french: "le fauteuil", english: "the armchair", partOfSpeech: "noun", unit: 3, gender: "m", tricky: true, audioHint: "foh-TUH-yuh" },
+  { key: "u3_larmoire", french: "l'armoire", english: "the wardrobe / closet", partOfSpeech: "noun", unit: 3, gender: "f", tricky: true, audioHint: "lar-MWAR" },
+  { key: "u3_la_lampe", french: "la lampe", english: "the lamp", partOfSpeech: "noun", unit: 3, gender: "f" },
+  { key: "u3_le_tapis", french: "le tapis", english: "the rug / carpet", partOfSpeech: "noun", unit: 3, gender: "m", tricky: true, audioHint: "tah-PEE" },
+  { key: "u3_le_rideau", french: "le rideau", english: "the curtain", partOfSpeech: "noun", unit: 3, gender: "m" },
+  { key: "u3_la_fenetre", french: "la fenêtre", english: "the window", partOfSpeech: "noun", unit: 3, gender: "f", tricky: true, audioHint: "fuh-NEH-truh" },
+  { key: "u3_la_porte", french: "la porte", english: "the door", partOfSpeech: "noun", unit: 3, gender: "f" },
+  { key: "u3_le_bureau_meuble", french: "le bureau", english: "the desk", partOfSpeech: "noun", unit: 3, gender: "m" },
+  { key: "u3_les_escaliers", french: "les escaliers", english: "the stairs", partOfSpeech: "noun", unit: 3, tricky: true, audioHint: "lay-zes-kah-LYAY" },
+  { key: "u3_le_mur", french: "le mur", english: "the wall", partOfSpeech: "noun", unit: 3, gender: "m" },
+  // Prepositions of location
+  { key: "u3_dans", french: "dans", english: "in / inside", partOfSpeech: "preposition", unit: 3 },
+  { key: "u3_sur", french: "sur", english: "on", partOfSpeech: "preposition", unit: 3 },
+  { key: "u3_sous", french: "sous", english: "under", partOfSpeech: "preposition", unit: 3 },
+  { key: "u3_devant", french: "devant", english: "in front of", partOfSpeech: "preposition", unit: 3 },
+  { key: "u3_derriere", french: "derrière", english: "behind", partOfSpeech: "preposition", unit: 3, tricky: true, audioHint: "deh-RYAIR" },
+  { key: "u3_a_cote_de", french: "à côté de", english: "next to / beside", partOfSpeech: "preposition", unit: 3, tricky: true },
+  { key: "u3_en_face_de", french: "en face de", english: "across from / facing", partOfSpeech: "preposition", unit: 3 },
+  { key: "u3_entre_prep", french: "entre", english: "between", partOfSpeech: "preposition", unit: 3 },
 ];
 
 // ─── UNIT 4 VOCABULARY ────────────────────────────────────────────────────────
@@ -445,40 +495,75 @@ export const VOCAB_UNIT4: VocabItem[] = [
   { key: "u4_la_piscine", french: "la piscine", english: "the swimming pool", partOfSpeech: "noun", unit: 4, gender: "f", tricky: true, audioHint: "pee-SEEN" },
   { key: "u4_le_cinema", french: "le cinéma", english: "the movie theater", partOfSpeech: "noun", unit: 4, gender: "m" },
   { key: "u4_le_stade", french: "le stade", english: "the stadium", partOfSpeech: "noun", unit: 4, gender: "m" },
+  // More places in town
+  { key: "u4_le_marche", french: "le marché", english: "the market", partOfSpeech: "noun", unit: 4, gender: "m" },
+  { key: "u4_la_gare", french: "la gare", english: "the train station", partOfSpeech: "noun", unit: 4, gender: "f" },
+  { key: "u4_la_poste", french: "la poste", english: "the post office", partOfSpeech: "noun", unit: 4, gender: "f" },
+  { key: "u4_la_banque", french: "la banque", english: "the bank", partOfSpeech: "noun", unit: 4, gender: "f" },
+  { key: "u4_le_magasin", french: "le magasin", english: "the store / shop", partOfSpeech: "noun", unit: 4, gender: "m" },
+  { key: "u4_lhopital", french: "l'hôpital", english: "the hospital", partOfSpeech: "noun", unit: 4, gender: "m", tricky: true, audioHint: "loh-pee-TAL" },
+  { key: "u4_lhotel", french: "l'hôtel", english: "the hotel", partOfSpeech: "noun", unit: 4, gender: "m", tricky: true, audioHint: "loh-TEL" },
+  { key: "u4_leglise", french: "l'église", english: "the church", partOfSpeech: "noun", unit: 4, gender: "f", tricky: true, audioHint: "lay-GLEEZ" },
+  // More faire expressions
+  { key: "u4_faire_du_ski", french: "faire du ski", english: "to ski", partOfSpeech: "phrase", unit: 4 },
+  { key: "u4_faire_de_la_natation", french: "faire de la natation", english: "to swim / to do swimming", partOfSpeech: "phrase", unit: 4 },
+  { key: "u4_faire_du_shopping", french: "faire du shopping", english: "to go shopping", partOfSpeech: "phrase", unit: 4 },
+  { key: "u4_faire_la_cuisine", french: "faire la cuisine", english: "to cook / to do the cooking", partOfSpeech: "phrase", unit: 4 },
+  // Seasons
+  { key: "u4_le_printemps", french: "le printemps", english: "spring", partOfSpeech: "noun", unit: 4, gender: "m", tricky: true, audioHint: "praN-TAWN" },
+  { key: "u4_lete", french: "l'été", english: "summer", partOfSpeech: "noun", unit: 4, gender: "m", tricky: true, audioHint: "lay-TAY" },
+  { key: "u4_lautomne", french: "l'automne", english: "fall / autumn", partOfSpeech: "noun", unit: 4, gender: "m", tricky: true, audioHint: "loh-TUN (the mn is silent)" },
+  { key: "u4_lhiver", french: "l'hiver", english: "winter", partOfSpeech: "noun", unit: 4, gender: "m", tricky: true, audioHint: "lee-VAIR" },
+  { key: "u4_en_ete", french: "en été", english: "in summer", partOfSpeech: "phrase", unit: 4 },
+  { key: "u4_en_hiver", french: "en hiver", english: "in winter", partOfSpeech: "phrase", unit: 4 },
+  // More -IR verbs
+  { key: "u4_grandir", french: "grandir", english: "to grow (up)", partOfSpeech: "verb", unit: 4 },
+  { key: "u4_obeir", french: "obéir (à)", english: "to obey", partOfSpeech: "verb", unit: 4, tricky: true, audioHint: "oh-bay-EER" },
+  { key: "u4_remplir", french: "remplir", english: "to fill (up)", partOfSpeech: "verb", unit: 4 },
+  { key: "u4_applaudir", french: "applaudir", english: "to applaud / to clap", partOfSpeech: "verb", unit: 4, tricky: true },
+  // Time sequence
+  { key: "u4_le_lundi", french: "le lundi", english: "on Mondays (every Monday)", partOfSpeech: "phrase", unit: 4 },
+  { key: "u4_tous_les_jours", french: "tous les jours", english: "every day", partOfSpeech: "phrase", unit: 4 },
+  { key: "u4_le_week_end_expr", french: "le week-end", english: "on weekends", partOfSpeech: "phrase", unit: 4 },
 ];
 
 // ─── UNIT 5 VOCABULARY ────────────────────────────────────────────────────────
 
 export const VOCAB_UNIT5: VocabItem[] = [
-  // Rooms
-  { key: "u5_la_maison", french: "la maison", english: "the house", partOfSpeech: "noun", unit: 5, gender: "f" },
-  { key: "u5_lappartement", french: "l'appartement", english: "the apartment", partOfSpeech: "noun", unit: 5, gender: "m" },
-  { key: "u5_la_chambre", french: "la chambre", english: "the bedroom", partOfSpeech: "noun", unit: 5, gender: "f" },
-  { key: "u5_la_salle_de_bain", french: "la salle de bain", english: "the bathroom", partOfSpeech: "noun", unit: 5, gender: "f" },
-  { key: "u5_la_cuisine", french: "la cuisine", english: "the kitchen", partOfSpeech: "noun", unit: 5, gender: "f" },
-  { key: "u5_le_salon", french: "le salon", english: "the living room", partOfSpeech: "noun", unit: 5, gender: "m" },
-  { key: "u5_la_salle_a_manger", french: "la salle à manger", english: "the dining room", partOfSpeech: "noun", unit: 5, gender: "f" },
-  { key: "u5_le_jardin", french: "le jardin", english: "the garden / yard", partOfSpeech: "noun", unit: 5, gender: "m" },
-  { key: "u5_le_garage", french: "le garage", english: "the garage", partOfSpeech: "noun", unit: 5, gender: "m" },
-  { key: "u5_le_bureau", french: "le bureau", english: "the office / desk", partOfSpeech: "noun", unit: 5, gender: "m" },
-  // Furniture / items
-  { key: "u5_le_lit", french: "le lit", english: "the bed", partOfSpeech: "noun", unit: 5, gender: "m" },
-  { key: "u5_la_table", french: "la table", english: "the table", partOfSpeech: "noun", unit: 5, gender: "f" },
-  { key: "u5_la_chaise", french: "la chaise", english: "the chair", partOfSpeech: "noun", unit: 5, gender: "f" },
-  { key: "u5_le_canape", french: "le canapé", english: "the sofa / couch", partOfSpeech: "noun", unit: 5, gender: "m" },
-  // Prepositions
-  { key: "u5_dans", french: "dans", english: "in / inside", partOfSpeech: "preposition", unit: 5 },
-  { key: "u5_sur", french: "sur", english: "on", partOfSpeech: "preposition", unit: 5 },
-  { key: "u5_sous", french: "sous", english: "under", partOfSpeech: "preposition", unit: 5 },
-  { key: "u5_devant", french: "devant", english: "in front of", partOfSpeech: "preposition", unit: 5 },
-  { key: "u5_derriere", french: "derrière", english: "behind", partOfSpeech: "preposition", unit: 5, tricky: true, audioHint: "deh-RYAIR" },
-  { key: "u5_a_cote_de", french: "à côté de", english: "next to / beside", partOfSpeech: "preposition", unit: 5, tricky: true },
-  { key: "u5_en_face_de", french: "en face de", english: "across from / facing", partOfSpeech: "preposition", unit: 5 },
-  { key: "u5_entre", french: "entre", english: "between", partOfSpeech: "preposition", unit: 5 },
-  // Aller contractions
-  { key: "u5_a_l", french: "à l'", english: "to the (before vowel/h)", partOfSpeech: "contraction", unit: 5 },
+  // Describing your home
+  { key: "u5_chez_moi", french: "chez moi", english: "at my place / at home", partOfSpeech: "phrase", unit: 5 },
+  { key: "u5_chez_toi", french: "chez toi", english: "at your place", partOfSpeech: "phrase", unit: 5 },
+  { key: "u5_chez_lui", french: "chez lui / chez elle", english: "at his / her place", partOfSpeech: "phrase", unit: 5 },
+  { key: "u5_une_piece", french: "une pièce", english: "a room", partOfSpeech: "noun", unit: 5, gender: "f", tricky: true, audioHint: "PYESS" },
+  { key: "u5_rez_de_chaussee", french: "le rez-de-chaussée", english: "the ground floor", partOfSpeech: "noun", unit: 5, gender: "m", tricky: true, audioHint: "ray-duh-show-SAY" },
+  { key: "u5_premier_etage", french: "le premier étage", english: "the first floor (2nd floor in US)", partOfSpeech: "noun", unit: 5, gender: "m" },
+  { key: "u5_deuxieme_etage", french: "le deuxième étage", english: "the second floor (3rd floor in US)", partOfSpeech: "noun", unit: 5, gender: "m" },
+  // Home adjectives
+  { key: "u5_moderne", french: "moderne", english: "modern", partOfSpeech: "adjective", unit: 5 },
+  { key: "u5_ancien", french: "ancien / ancienne", english: "old / historic (of buildings)", partOfSpeech: "adjective", unit: 5, tricky: true },
+  { key: "u5_confortable", french: "confortable", english: "comfortable", partOfSpeech: "adjective", unit: 5 },
+  { key: "u5_propre", french: "propre", english: "clean", partOfSpeech: "adjective", unit: 5, tricky: true, audioHint: "PROP-ruh" },
+  { key: "u5_sale", french: "sale", english: "dirty", partOfSpeech: "adjective", unit: 5 },
+  { key: "u5_spacieux", french: "spacieux / spacieuse", english: "spacious", partOfSpeech: "adjective", unit: 5 },
+  // Irregular -IR verbs (dormir group)
+  { key: "u5_dormir", french: "dormir", english: "to sleep", partOfSpeech: "verb", unit: 5, tricky: true, audioHint: "dor-MEER" },
+  { key: "u5_sortir", french: "sortir", english: "to go out", partOfSpeech: "verb", unit: 5, tricky: true, audioHint: "sor-TEER" },
+  { key: "u5_partir", french: "partir", english: "to leave / to depart", partOfSpeech: "verb", unit: 5, tricky: true, audioHint: "par-TEER" },
   // Venir
-  { key: "u5_venir", french: "venir", english: "to come", partOfSpeech: "verb", unit: 5, tricky: true },
+  { key: "u5_venir", french: "venir", english: "to come", partOfSpeech: "verb", unit: 5, tricky: true, audioHint: "vuh-NEER" },
+  { key: "u5_venir_de", french: "venir de + infinitif", english: "to have just done (recent past)", partOfSpeech: "structure", unit: 5, tricky: true },
+  // Contractions with de
+  { key: "u5_du_de", french: "du (de + le)", english: "of the / from the (masc.)", partOfSpeech: "contraction", unit: 5, tricky: true },
+  { key: "u5_de_la_de", french: "de la", english: "of the / from the (fem.)", partOfSpeech: "contraction", unit: 5 },
+  { key: "u5_a_l", french: "à l'", english: "to the / of the (before vowel/h)", partOfSpeech: "contraction", unit: 5 },
+  // Activities at home
+  { key: "u5_ranger", french: "ranger", english: "to tidy up / to put away", partOfSpeech: "verb", unit: 5 },
+  { key: "u5_nettoyer", french: "nettoyer", english: "to clean", partOfSpeech: "verb", unit: 5, tricky: true, audioHint: "neh-twah-YAY" },
+  { key: "u5_ouvrir", french: "ouvrir", english: "to open", partOfSpeech: "verb", unit: 5, tricky: true },
+  { key: "u5_fermer", french: "fermer", english: "to close / to shut", partOfSpeech: "verb", unit: 5 },
+  { key: "u5_monter", french: "monter", english: "to go up / to climb", partOfSpeech: "verb", unit: 5 },
+  { key: "u5_descendre", french: "descendre", english: "to go down", partOfSpeech: "verb", unit: 5, tricky: true, audioHint: "deh-SON-druh" },
+  { key: "u5_rentrer", french: "rentrer", english: "to come back home / to return", partOfSpeech: "verb", unit: 5 },
 ];
 
 // ─── UNIT 6 VOCABULARY ────────────────────────────────────────────────────────
@@ -518,6 +603,39 @@ export const VOCAB_UNIT6: VocabItem[] = [
   // Vouloir / Pouvoir
   { key: "u6_vouloir", french: "vouloir", english: "to want", partOfSpeech: "verb", unit: 6, tricky: true, audioHint: "voo-LWAR" },
   { key: "u6_pouvoir", french: "pouvoir", english: "to be able to / can", partOfSpeech: "verb", unit: 6, tricky: true, audioHint: "poo-VWAR" },
+  // More food
+  { key: "u6_les_pates", french: "les pâtes", english: "pasta", partOfSpeech: "noun", unit: 6, tricky: true, audioHint: "lay PAT" },
+  { key: "u6_le_riz", french: "le riz", english: "rice", partOfSpeech: "noun", unit: 6, gender: "m", tricky: true, audioHint: "luh REE" },
+  { key: "u6_les_frites", french: "les frites", english: "French fries", partOfSpeech: "noun", unit: 6 },
+  { key: "u6_le_steak", french: "le steak", english: "steak", partOfSpeech: "noun", unit: 6, gender: "m" },
+  { key: "u6_le_croissant", french: "le croissant", english: "the croissant", partOfSpeech: "noun", unit: 6, gender: "m", tricky: true, audioHint: "kwah-SON" },
+  { key: "u6_la_baguette", french: "la baguette", english: "the baguette", partOfSpeech: "noun", unit: 6, gender: "f" },
+  { key: "u6_les_oeufs", french: "les œufs", english: "eggs", partOfSpeech: "noun", unit: 6, tricky: true, audioHint: "lay ZUH (singular: un œuf = UN UF)" },
+  { key: "u6_le_yaourt", french: "le yaourt", english: "yogurt", partOfSpeech: "noun", unit: 6, gender: "m", tricky: true, audioHint: "yah-OOR" },
+  { key: "u6_le_jambon", french: "le jambon", english: "ham", partOfSpeech: "noun", unit: 6, gender: "m", tricky: true, audioHint: "zhom-BON" },
+  { key: "u6_la_soupe", french: "la soupe", english: "soup", partOfSpeech: "noun", unit: 6, gender: "f" },
+  { key: "u6_la_tarte", french: "la tarte", english: "the tart / pie", partOfSpeech: "noun", unit: 6, gender: "f" },
+  { key: "u6_la_fraise", french: "la fraise", english: "strawberry", partOfSpeech: "noun", unit: 6, gender: "f" },
+  { key: "u6_le_raisin", french: "le raisin", english: "grapes", partOfSpeech: "noun", unit: 6, gender: "m", tricky: true, audioHint: "reh-ZAN" },
+  { key: "u6_la_tomate", french: "la tomate", english: "tomato", partOfSpeech: "noun", unit: 6, gender: "f" },
+  { key: "u6_la_carotte", french: "la carotte", english: "carrot", partOfSpeech: "noun", unit: 6, gender: "f" },
+  // Drinks
+  { key: "u6_le_coca", french: "le coca", english: "cola / Coke", partOfSpeech: "noun", unit: 6, gender: "m" },
+  { key: "u6_la_limonade", french: "la limonade", english: "lemon soda / sparkling lemonade", partOfSpeech: "noun", unit: 6, gender: "f" },
+  { key: "u6_le_chocolat_chaud", french: "le chocolat chaud", english: "hot chocolate", partOfSpeech: "noun", unit: 6, gender: "m" },
+  // Meals
+  { key: "u6_le_petit_dejeuner", french: "le petit-déjeuner", english: "breakfast", partOfSpeech: "noun", unit: 6, gender: "m", tricky: true, audioHint: "puh-tee day-zhuh-NAY" },
+  { key: "u6_le_dejeuner", french: "le déjeuner", english: "lunch", partOfSpeech: "noun", unit: 6, gender: "m", tricky: true, audioHint: "day-zhuh-NAY" },
+  { key: "u6_le_diner", french: "le dîner", english: "dinner", partOfSpeech: "noun", unit: 6, gender: "m", tricky: true, audioHint: "dee-NAY" },
+  // More restaurant / eating phrases
+  { key: "u6_avoir_faim", french: "avoir faim", english: "to be hungry", partOfSpeech: "phrase", unit: 6, tricky: true, audioHint: "ah-VWAR FAN" },
+  { key: "u6_avoir_soif", french: "avoir soif", english: "to be thirsty", partOfSpeech: "phrase", unit: 6, tricky: true, audioHint: "ah-VWAR SWAF" },
+  { key: "u6_cest_delicieux", french: "C'est délicieux !", english: "It's delicious!", partOfSpeech: "phrase", unit: 6, tricky: true },
+  { key: "u6_laddition_svp", french: "L'addition, s'il vous plaît.", english: "The check, please.", partOfSpeech: "phrase", unit: 6 },
+  { key: "u6_je_suis_vegetarien", french: "Je suis végétarien(ne).", english: "I am vegetarian.", partOfSpeech: "phrase", unit: 6, tricky: true },
+  { key: "u6_manger_verb", french: "manger", english: "to eat (irregular spelling)", partOfSpeech: "verb", unit: 6 },
+  { key: "u6_boire", french: "boire", english: "to drink", partOfSpeech: "verb", unit: 6, tricky: true, audioHint: "BWAR" },
+  { key: "u6_prendre", french: "prendre", english: "to take / to have (food/drink)", partOfSpeech: "verb", unit: 6, tricky: true, audioHint: "PRON-druh" },
 ];
 
 // ─── GLUE WORDS ───────────────────────────────────────────────────────────────
